@@ -8,6 +8,7 @@ import { toggle } from "../context/sidebarSlice";
 import Logout from "../icons/Logout";
 import Dark from "../icons/Dark";
 import Light from "../icons/Light";
+import logo from '../assets/Studio_Sodwe__1_-removebg-preview.png';
 
 const Navbar = () => {
   const open = useSelector((state) => state.sidebar.open);
@@ -34,8 +35,9 @@ const Navbar = () => {
         "
         >
           {!open ? <Hamburger /> : <Cancel />}
+          <img src={logo} alt="Logo" className="h-20" /> {/* Replace text with logo */}
         </div>
-        FaithHub
+        {/* FaithHub */}
       </div>
 
       {/* // Search Bar */}
