@@ -56,7 +56,7 @@ const Myanswers = () => {
             // onClick={() => navigateToContent(question.doubtDetails.questionId)}
             //   style={{ cursor: "pointer" }}
           >
-            <div className=" w-full bg-white dark:bg-[#1E212A] p-4 md:p-5 rounded-lg shadow-md flex items-start gap-5 border-2 hover:bg-gray-200 transition-all ">
+            <div className=" w-full bg-white dark:bg-[#1E212A] p-4 md:p-5 rounded-lg shadow-md flex items-start gap-5 border-2 hover:bg-gray-200 transition-all hover:scale-105">
               <div className="left-section space-y-1 text-center">
                 <Arrowup id={question.doubtDetails.questionId} />
                 <h3 className="text-sm md:text-base">

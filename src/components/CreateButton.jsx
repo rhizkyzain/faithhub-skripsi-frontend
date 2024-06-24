@@ -9,7 +9,7 @@ const CreateButton = ({ label, navigateTo }) => {
   return (
     <div
       onClick={() => navigate(navigateTo)}
-      className={`flex items-center gap-2 bg-blue-600 rounded-md shadow-sm px-7 py-4 cursor-pointer hover:bg-blue-900 transition-all active:bg-blue-800 `}
+      className={`flex items-center gap-2 bg-blue-600 rounded-md shadow-sm px-7 py-4 cursor-pointer hover:bg-blue-900 transition-all active:bg-blue-800 hover:scale-105`}
     >
       <Add />
       
