@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, ListGroup, ListGroupItem } from "react-bootstrap";
 import JoditEditor from "jodit-react";
 import parse from "html-react-parser";
@@ -8,7 +8,10 @@ import Arrowup from "../icons/Arrowup";
 import Arrowdown from "../icons/Arrowdown";
 import { useQuery } from "react-query";
 import Loading from "../components/Loading";
+import { BsArrowLeft } from "react-icons/bs"; // Importing left arrow icon from react-icons/bs
+
 const QuestionDetail = () => {
+  const navigate = useNavigate();
   const { questionId } = useParams();
   const [questionData, setQuestionData] = useState({});
   const [ownerInfo, setOwnerInfo] = useState({});
@@ -16,11 +19,8 @@ const QuestionDetail = () => {
   const [newReply, setNewReply] = useState("");
   const [arrowUp, setArrowUp] = useState(0);
   const [arrowDown, setArrowDown] = useState(0);
-  
 
   useEffect(() => {
-    
-  
     const fetchQuestionDetails = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -43,7 +43,7 @@ const QuestionDetail = () => {
     };
 
     fetchQuestionDetails();
-  }, [questionId],);
+  }, [questionId]);
 
   const handleReplySubmit = async (e) => {
     e.preventDefault();
@@ -79,20 +79,18 @@ const QuestionDetail = () => {
       console.error("Error fetching replies:", error);
     }
   };
-  
+
   const fetchUser = async () => {
     const token = localStorage.getItem("token");
     const config = {
-      headers: { Authorization: "Bearer " + token},
+      headers: { Authorization: "Bearer " + token },
     };
-    // console.log(config);
-    const res = await axios.get('https://faithhub-skripsi-backend.vercel.app/api/auth/myProfile', config);
-    // console.log(res);
+    const res = await axios.get(
+      "https://faithhub-skripsi-backend.vercel.app/api/auth/myProfile",
+      config
+    );
     return res.data;
   };
-  
-  
-  
 
   const commentConfig = useMemo(
     () => ({
@@ -110,39 +108,62 @@ const QuestionDetail = () => {
         "fontsize",
         "redo",
         "undo",
-        "image"
+        "image",
       ],
     }),
     []
   );
 
-  const { isLoading,data } = useQuery("getUserInfo", fetchUser);
+  const { isLoading, data: currentUser } = useQuery("getUserInfo", fetchUser);
+
   if (isLoading) return <Loading />;
-  const currentUser = data;
+
   return (
     <div className="mt-5 md:w-[100%] flex flex-col items-center">
       <Card className="w-full md:w-2/3 lg:w-1/2 mb-10">
         <Card.Body>
-          <Card.Title>{questionData.questionTitle}</Card.Title>
-          <Card.Text>{questionData.description && parse(questionData.description)}</Card.Text>
+          <div className="flex items-center justify-between mb-4">
+          <Button
+  variant="light"
+  onClick={() => navigate(-1)}
+  className="text-gray-600 hover:text-gray-900 flex items-center gap-1"
+  style={{
+    border: "1px solid #ccc",
+    padding: "5px 10px",
+    borderRadius: "5px",
+    display: "flex",     // Ensure the button content is displayed as flexbox
+    alignItems: "center" // Align items vertically centered
+  }}
+>
+  <BsArrowLeft style={{ fontSize: "1.2rem", marginRight: "5px" }} /> {/* Left arrow icon */}
+  <span className="text-xs font-semibold" style={{ lineHeight: "1" }}>Back</span>
+</Button>
+
+
+
+          </div>
+          <Card.Title className="mb-0">{questionData.questionTitle}</Card.Title>
+          <Card.Text>
+            {questionData.description && parse(questionData.description)}
+          </Card.Text>
           <ListGroup className="list-group-flush">
-            
             <ListGroupItem className="text-gray-300 text-xs">
-          Posted by:
-          <span className=" ml-1 text-blue-800 font-bold  md:text-sm">
-            {ownerInfo
-              ? ownerInfo.name === currentUser?.data.name
-                ? ownerInfo?.name + " (You)"
-                :ownerInfo?.name
-              :""}
-          </span>
-        
+              Posted by:{" "}
+              <span className="ml-1 text-blue-800 font-bold  md:text-sm">
+                {ownerInfo
+                  ? ownerInfo.name === currentUser?.data.name
+                    ? ownerInfo?.name + " (You)"
+                    : ownerInfo?.name
+                  : ""}
+              </span>
             </ListGroupItem>
           </ListGroup>
           <div className="flex items-end justify-end">
-            <Arrowup id={questionData.questionId}  />
-            <h3 className="text-sm text-right md:text-base mx-2 mb-1 m">{questionData.upVotes?.length || 0}</h3>
-            <Arrowdown id={questionData.questionId}  />
+            <Arrowup id={questionData.questionId} />
+            <h3 className="text-sm text-right md:text-base mx-2 mb-1 m">
+              {questionData.upVotes?.length || 0}
+            </h3>
+            <Arrowdown id={questionData.questionId} />
           </div>
         </Card.Body>
       </Card>
@@ -164,7 +185,9 @@ const QuestionDetail = () => {
             <Card.Body>
               <Card.Text>{parse(reply.replyData.reply.reply)}</Card.Text>
               <div className="d-flex justify-content-between align-items-center">
-                <small className="text-muted">Posted by: {reply.replyData.ownerInfo.name}</small>
+                <small className="text-muted">
+                  Posted by: {reply.replyData.ownerInfo.name}
+                </small>
               </div>
             </Card.Body>
           </Card>

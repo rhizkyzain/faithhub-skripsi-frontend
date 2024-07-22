@@ -61,6 +61,10 @@ const Askquestion = () => {
     []
   );
 
+  const handleCancel = () => {
+    navigate(-1); // Navigate back to the previous page
+  };
+
   return (
     <div className="h-full md:w-[50%]">
       <Toaster />
@@ -94,12 +98,21 @@ const Askquestion = () => {
               type="text"
             />
           </div>
-          <button
-            type="submit"
-            className="mt-8 w-[230px] mx-auto text-center flex justify-center items-center gap-2 bg-purple-700 rounded-md shadow-sm px-8 py-2 cursor-pointer hover:bg-blue-900 transition-all active:bg-blue-800"
-          >
-            <span className="text-white">Ask</span>
-          </button>
+          <div className="flex justify-center gap-4 mt-8">
+            <button
+              type="submit"
+              className="w-[100px] text-center flex justify-center items-center gap-2 bg-purple-700 rounded-md shadow-sm px-4 py-2 cursor-pointer hover:bg-blue-900 transition-all active:bg-blue-800"
+            >
+              <span className="text-white">Ask</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="w-[100px] text-center flex justify-center items-center gap-2 bg-gray-600 rounded-md shadow-sm px-4 py-2 cursor-pointer hover:bg-gray-700 transition-all active:bg-gray-800"
+            >
+              <span className="text-white">Cancel</span>
+            </button>
+          </div>
         </form>
       </div>
     </div>

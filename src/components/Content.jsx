@@ -23,6 +23,7 @@ const Content = () => {
   const [animationFinished, setAnimationFinished] = useState(false);
   const navigate = useNavigate();
 
+  // Fetch questions
   const fetchQuestions = async () => {
     const token = localStorage.getItem("token");
     const config = { headers: { Authorization: "Bearer " + token } };
@@ -38,21 +39,40 @@ const Content = () => {
     return res.data;
   };
 
-  const { isLoading, data } = useQuery(["getQuestions", tags], fetchQuestions);
+  // Fetch articles only if tags are present
+  const fetchArticles = async () => {
+    const token = localStorage.getItem("token");
+    const config = { headers: { Authorization: "Bearer " + token } };
+    const body = { tags: tags };
+
+    let res;
+    if (tags) {
+      res = await axios.post('https://faithhub-skripsi-backend.vercel.app/api/article/getArticlebyTags', body, config);
+    } else {
+      res = [];
+    }
+
+    return res.data;
+  };
+
+  const { isLoading: isLoadingQuestions, data: questions } = useQuery(["getQuestions", tags], fetchQuestions);
+  const { isLoading: isLoadingArticles, data: articles } = useQuery(["getArticles", tags], fetchArticles, {
+    enabled: !!tags // Only fetch articles if tags are present
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimationFinished(true);
-    }, 1000); // 1.5 seconds delay for the animation
+    }, 1000); // 1 second delay for the animation
 
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    if (animationFinished && !isLoading) {
+    if (animationFinished && !isLoadingQuestions && (!tags || !isLoadingArticles)) {
       setShowContent(true);
     }
-  }, [animationFinished, isLoading]);
+  }, [animationFinished, isLoadingQuestions, isLoadingArticles, tags]);
 
   if (!showContent) {
     return (
@@ -81,40 +101,73 @@ const Content = () => {
     );
   }
 
+  const hasQuestions = questions && questions.length > 0;
+  const hasArticles = articles && articles.length > 0;
+
+  if (!hasQuestions && !hasArticles) {
+    return <NothingHere />;
+  }
+
   return (
     <div className="md:w-[60%] flex flex-col items-center gap-y-5 md:gap-1 my-8">
       <Toaster />
-      {data && data.length > 0 ? (
-        data.map((question, index) => (
-          <div
-            key={index}
-            className="w-[96%] md:w-[80%] mx-12 flex flex-col items-end p-3 md:p-1 rounded-md bg-black-100 dark:bg-slate-400"
-            onClick={() => navigate(`/question/${question.doubtDetails.questionId}`)}
-            style={{ cursor: "pointer" }}
-          >
-            <div className="w-full bg-white dark:bg-[#1E212A] p-4 md:p-5 rounded-lg shadow-md flex items-start gap-5 border-2 hover:bg-gray-200 transition-all hover:scale-105">
-              <div className="left-section space-y-1 text-center">
-                <Arrowup id={question.doubtDetails.questionId} />
-                <h3 className="text-sm md:text-base">
-                  {question?.doubtDetails.upVotes?.length || 0}
-                </h3>
-                <Arrowdown id={question.doubtDetails.questionId} />
-              </div>
-              <div className="right-section w-full">
-                <h1 className="text-base md:text-lg dark:text-white">
-                  {question?.doubtDetails.questionTitle}
-                </h1>
-                <p className="text-sm md:text-base">
-                  {parse(truncateText(question?.doubtDetails.description, 150))}
-                </p>
-                <hr />
-                <UserInfo openId={openId} index={index + 1} setOpenId={setOpenId} question={question} />
+      {hasQuestions && (
+        <>
+          {questions.map((question, index) => (
+            <div
+              key={index}
+              className="w-[96%] md:w-[80%] mx-12 flex flex-col items-end p-3 md:p-1 rounded-md bg-black-100 dark:bg-slate-400"
+              onClick={() => navigate(`/question/${question.doubtDetails.questionId}`)}
+              style={{ cursor: "pointer" }}
+            >
+              <div className="w-full bg-white dark:bg-[#1E212A] p-4 md:p-5 rounded-lg shadow-md flex items-start gap-5 border-2 hover:bg-gray-200 transition-all hover:scale-105">
+                <div className="left-section space-y-1 text-center">
+                  <Arrowup id={question.doubtDetails.questionId} />
+                  <h3 className="text-sm md:text-base">
+                    {question?.doubtDetails.upVotes?.length || 0}
+                  </h3>
+                  <Arrowdown id={question.doubtDetails.questionId} />
+                </div>
+                <div className="right-section w-full">
+                  <h1 className="text-base md:text-lg dark:text-white">
+                    {!tags ? question?.doubtDetails.questionTitle : `[question] ${question?.doubtDetails.questionTitle}`}
+                  </h1>
+                  <p className="text-sm md:text-base">
+                    {parse(truncateText(question?.doubtDetails.description, 150))}
+                  </p>
+                  <hr />
+                  <UserInfo openId={openId} index={index + 1} setOpenId={setOpenId} question={question} />
+                </div>
               </div>
             </div>
-          </div>
-        ))
-      ) : (
-        <NothingHere />
+          ))}
+        </>
+      )}
+
+      {hasArticles && (
+        <>
+          {articles.map((article, index) => (
+            <div
+              key={index}
+              className="w-[96%] md:w-[80%] mx-12 flex flex-col items-end p-3 md:p-1 rounded-md bg-black-100 dark:bg-slate-400"
+              onClick={() => navigate(`/article/${article.articleDetails.articleId}`)}
+              style={{ cursor: "pointer" }}
+            >
+              <div className="w-full bg-white dark:bg-[#1E212A] p-4 md:p-5 rounded-lg shadow-md flex items-start gap-5 border-2 hover:bg-gray-200 transition-all hover:scale-105">
+                <div className="right-section w-full">
+                  <h1 className="text-base md:text-lg dark:text-white">
+                    [article] {article?.articleDetails.articleTitle}
+                  </h1>
+                  <p className="text-sm md:text-base">
+                    {parse(truncateText(article?.articleDetails.description, 150))}
+                  </p>
+                  <hr />
+                  <UserInfo openId={openId} index={index + 1} setOpenId={setOpenId} article={article} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </>
       )}
     </div>
   );
