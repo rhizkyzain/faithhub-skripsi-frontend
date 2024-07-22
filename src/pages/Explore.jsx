@@ -32,7 +32,7 @@ const Explore = () => {
   const navigateToContent = (tag) => {
     navigate({
       pathname: "/",
-      search: `?tags=${topic}`
+      search: `?tags=${tag}`
     });
   };
 
