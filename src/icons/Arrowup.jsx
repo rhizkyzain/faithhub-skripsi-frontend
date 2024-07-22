@@ -1,26 +1,24 @@
 import axios from "axios";
 import React, { useState } from "react";
 
-const Arrowup = ({ id }) => {
+const Arrowup = ({ id, voteType }) => {
   const [isClicked, setIsClicked] = useState(false);
 
   const handleClick = async (e) => {
+    e.preventDefault();
     const token = localStorage.getItem("token");
     const config = {
       headers: { Authorization: "Bearer " + token },
     };
     const body = { type: "up" };
+    const route = voteType === "question"
+      ? `https://faithhub-skripsi-backend.vercel.app/api/question/vote/${id}`
+      : `https://faithhub-skripsi-backend.vercel.app/api/article/vote/${id}`;
 
-    e.preventDefault();
     try {
-      const res = await axios.post(
-        `https://faithhub-skripsi-backend.vercel.app/api/question/vote/${id}`,
-        body,
-        config
-      );
-      console.log(res);
+      const res = await axios.post(route, body, config);
       if (res.status === 200) {
-        setIsClicked(true); // Update state to indicate it's clicked
+        setIsClicked(true);
         alert("Upvoted successfully");
       } else {
         alert("You have already upvoted");
@@ -31,7 +29,7 @@ const Arrowup = ({ id }) => {
     }
   };
 
-  const iconColor = isClicked ? "text-blue-800" : "dark:text-white"; // Change color based on state
+  const iconColor = isClicked ? "text-blue-800" : "dark:text-white";
 
   return (
     <svg

@@ -159,11 +159,11 @@ const QuestionDetail = () => {
             </ListGroupItem>
           </ListGroup>
           <div className="flex items-end justify-end">
-            <Arrowup id={questionData.questionId} />
+            <Arrowup id={questionData.questionId} voteType="question" />
             <h3 className="text-sm text-right md:text-base mx-2 mb-1 m">
               {questionData.upVotes?.length || 0}
             </h3>
-            <Arrowdown id={questionData.questionId} />
+            <Arrowdown id={questionData.questionId} voteType="question" />
           </div>
         </Card.Body>
       </Card>

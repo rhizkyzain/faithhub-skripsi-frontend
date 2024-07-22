@@ -1,33 +1,37 @@
 import axios from "axios";
-import React from "react";
+import React, { useState } from "react";
 
-const Arrowdown = ({ id }) => {
+const Arrowdown = ({ id, voteType }) => {
+  const [isClicked, setIsClicked] = useState(false);
 
-  // console.log(token);
   const handleClick = async (e) => {
+    e.preventDefault();
     const token = localStorage.getItem("token");
     const config = {
-      headers: { Authorization: "Bearer " + token},
+      headers: { Authorization: "Bearer " + token },
     };
     const body = { type: "down" };
+    const route = voteType === "question"
+      ? `https://faithhub-skripsi-backend.vercel.app/api/question/vote/${id}`
+      : `https://faithhub-skripsi-backend.vercel.app/api/article/vote/${id}`;
+      
       
   
     e.preventDefault();
+
+  
+    e.preventDefault();
     try {
-      const res = await axios.post(
-        `https://faithhub-skripsi-backend.vercel.app/api/question/vote/${id}`,
-        body,
-        config
-      );
-      console.log(res);
+      const res = await axios.post(route, body, config);
       if (res.status === 200) {
+        setIsClicked(true);
         alert("Downvoted successfully");
       } else {
-        alert("You have already Downvoted");
+        alert("You have already downvoted");
       }
     } catch (err) {
       console.log(err);
-      alert("You have already Downvoted");
+      alert("You have already downvoted");
     }
   };
   return (

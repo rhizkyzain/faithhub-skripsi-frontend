@@ -149,9 +149,9 @@ const ArticleDetail = () => {
             </ListGroupItem>
           </ListGroup>
           <div className="flex items-end justify-end">
-            <Arrowup id={articleData.articleId} /> {/* Assuming 'articleId' as identifier */}
+          <Arrowup id={articleData.articleId} voteType="article" /> {/* Assuming 'articleId' as identifier */}
             <h3 className="text-sm text-right md:text-base mx-2 mb-1 m">{articleData.upVotes?.length || 0}</h3>
-            <Arrowdown id={articleData.articleId} /> {/* Assuming 'articleId' as identifier */}
+          <Arrowdown id={articleData.articleId} voteType="article" /> {/* Assuming 'articleId' as identifier */}
           </div>
         </Card.Body>
       </Card>
