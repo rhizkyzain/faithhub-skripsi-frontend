@@ -31,7 +31,7 @@ const SearchResults = () => {
       const params = { query: query };
   
       try {
-        const res = await axios.get('http://faithhub-skripsi-backend.vercel.app/api/question/searchContent', { params, ...config });
+        const res = await axios.get('https://faithhub-skripsi-backend.vercel.app/api/question/searchContent', { params, ...config });
         return res.data;
       } catch (err) {
         console.error("Error fetching search results:", err);
