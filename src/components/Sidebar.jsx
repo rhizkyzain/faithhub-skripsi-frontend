@@ -117,6 +117,30 @@ const Sidebar = () => {
       </li>
 
       <li
+        onClick={() => navigate("/audio")}
+        className={
+          "flex items-center gap-2 mx-2 md:mx-0 px-4 py-1 cursor-pointer hover:bg-blue-100 hover:text-blue-400 transition-all " +
+          (location === "/audio" ? active : "")
+        }
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-4 h-4"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3 8v12l9-6 9 6V8l-9 6-9-6z"
+          />
+        </svg>
+        AUDIO CONTENT
+      </li>
+
+      <li
         onClick={() => {
           navigate("/ask");
           dispatch(toggle());
@@ -128,6 +152,8 @@ const Sidebar = () => {
         
         Ask a Question
       </li>
+
+      
     </div>
   );
 };

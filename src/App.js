@@ -15,6 +15,7 @@ import Myanswers from "./pages/Myanswers";
 import Explore from "./pages/Explore";
 import Article from "./pages/Article";
 import ArticleDetails from "./pages/ArticleDetail";
+import Audio from './pages/Audio'; 
 import { useEffect} from "react";
 import SearchResults from "./pages/SearchResult";
 
@@ -119,6 +120,10 @@ const router = createBrowserRouter([
       {
         path: "/searchresults",
         element: <SearchResults />,
+      },
+      {
+        path: "/audio",
+        element: <Audio />,
       },
       {
         path: "*",
