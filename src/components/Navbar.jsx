@@ -68,6 +68,7 @@ const Navbar = () => {
             className="cursor-pointer text-sm md:text-base dark:text-white"
             onClick={() => {
               localStorage.removeItem("token");
+              localStorage.removeItem("role");
               navigate("/login");
             }}
           >
