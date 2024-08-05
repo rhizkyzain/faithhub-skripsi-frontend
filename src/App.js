@@ -16,6 +16,8 @@ import Explore from "./pages/Explore";
 import Article from "./pages/Article";
 import ArticleDetails from "./pages/ArticleDetail";
 import Audio from './pages/Audio'; 
+import Admin from './pages/AdminPage'; 
+import Manage from './pages/AdminManage'; 
 import { useEffect} from "react";
 import SearchResults from "./pages/SearchResult";
 
@@ -120,6 +122,14 @@ const router = createBrowserRouter([
       {
         path: "/searchresults",
         element: <SearchResults />,
+      },
+      {
+        path: "/admin",
+        element: <Admin />,
+      },
+      {
+        path: "/manage",
+        element: <Manage />,
       },
       {
         path: "/audio",
