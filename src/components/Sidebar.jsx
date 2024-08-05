@@ -1,225 +1,201 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Loading from "../components/Loading";
-import CreateAudio from '../components/CreateAudio';
+import React from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
-const Manage = () => {
-  const [questions, setQuestions] = useState([]);
-  const [articles, setArticles] = useState([]);
-  const [audio, setAudio] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showCreateAudio, setShowCreateAudio] = useState(false);
+const Sidebar = () => {
+  const navigate = useNavigate();
+  const location = window.location.pathname;
+  const open = useSelector((state) => state.sidebar.open);
+  
+  const active =
+    " bg-blue-100 text-blue-400 px-4 py-2 rounded-sm border-l-4 border-purple-700";
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem('token');
-
-      try {
-        const questionsRes = await axios.get('https://faithhub-skripsi-backend.vercel.app/api/question/fetchAll', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setQuestions(questionsRes.data);
-
-        const articlesRes = await axios.get('https://faithhub-skripsi-backend.vercel.app/api/article/get/all', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setArticles(articlesRes.data);
-
-        const audioRes = await axios.get('https://faithhub-skripsi-backend.vercel.app/api/question/getAudioContent', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setAudio(audioRes.data);
-
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to fetch data. Please try again.');
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleDelete = async (type, id) => {
-    const token = localStorage.getItem('token');
-    let url = '';
-    switch (type) {
-      case 'question':
-        url = `https://faithhub-skripsi-backend.vercel.app/api/question/delete/${id}`;
-        break;
-      case 'article':
-        url = `https://faithhub-skripsi-backend.vercel.app/api/article/deleteArticle/${id}`;
-        break;
-      case 'audio':
-        url = `https://faithhub-skripsi-backend.vercel.app/api/question/deleteAudio/${id}`;
-        break;
-      default:
-        return;
-    }
-
-    try {
-      await axios.delete(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      // Update local state based on type
-      switch (type) {
-        case 'question':
-          setQuestions(questions.filter((q) => q.doubtDetails.questionId !== id));
-          break;
-        case 'article':
-          setArticles(articles.filter((a) => a.articleDetails.articleId !== id));
-          break;
-        case 'audio':
-          setAudio(audio.filter((a) => a.audioDetail.audioId !== id));
-          break;
-        default:
-          break;
-      }
-    } catch (err) {
-      console.error('Failed to delete content:', err);
-      setError('Failed to delete content. Please try again.');
-    }
-  };
-
-  const handleCreateAudio = () => {
-    setShowCreateAudio(true);
-  };
-
-  const handleCloseCreateAudio = () => {
-    setShowCreateAudio(false);
-  };
-
-  const refreshAudioList = async () => {
-    const token = localStorage.getItem('token');
-    try {
-      const audioRes = await axios.get('https://faithhub-skripsi-backend.vercel.app/api/question/getAudioContent', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setAudio(audioRes.data);
-    } catch (err) {
-      console.error('Failed to refresh audio list:', err);
-      setError('Failed to refresh audio list. Please try again.');
-    }
-  };
-
-  const handleAudioUploadSuccess = () => {
-    refreshAudioList();
-    handleCloseCreateAudio();
-  };
-
-  if (loading) return <Loading />;
-
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-lg text-red-500">{error}</div>
-      </div>
-    );
-  }
+  // Retrieve role from localStorage
+  const role = localStorage.getItem("role");
 
   return (
-    <div className="p-8 bg-white border-2 rounded-xl min-h-screen mt-10">
-      <h1 className="text-3xl font-bold mb-6">Manage Content</h1>
-
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-6 max-w-7xl mx-auto">
-          {/* Questions Container */}
-          <div className="bg-white border-2 rounded-lg p-6 relative max-w-full">
-            <h2 className="text-xl font-semibold sticky top-16 bg-gray-100 py-2 px-4 border-b z-10">Questions</h2>
-            <div className="h-[50vh] overflow-y-auto mt-2">
-              {questions.length > 0 ? (
-                questions.map((question) => (
-                  <div key={question.doubtDetails.questionId} className="mb-4 p-4 border-b border-gray-300 flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">{question.doubtDetails.questionTitle}</h3>
-                    <button
-                      className="text-red-500 hover:text-red-700 transition-colors"
-                      onClick={() => {
-                        if (window.confirm('Are you sure you want to delete this question?')) {
-                          handleDelete('question', question.doubtDetails.questionId);
-                        }
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <p>No questions available.</p>
-              )}
-            </div>
-          </div>
-
-          {/* Articles Container */}
-          <div className="bg-white border-2 rounded-lg p-6 relative max-w-full">
-            <h2 className="text-xl font-semibold sticky top-16 bg-gray-100 py-2 px-4 border-b z-10">Articles</h2>
-            <div className="h-[50vh] overflow-y-auto mt-2">
-              {articles.length > 0 ? (
-                articles.map((article) => (
-                  <div key={article.articleDetails.articleId} className="mb-4 p-4 border-b border-gray-300 flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">{article.articleDetails.articleTitle}</h3>
-                    <button
-                      className="text-red-500 hover:text-red-700 transition-colors"
-                      onClick={() => {
-                        if (window.confirm('Are you sure you want to delete this article?')) {
-                          handleDelete('article', article.articleDetails.articleId);
-                        }
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <p>No articles available.</p>
-              )}
-            </div>
-          </div>
-
-          {/* Audio Container */}
-          <div className="bg-white border-2 rounded-lg p-6 relative max-w-full">
-            <h2 className="text-xl font-semibold sticky top-16 bg-gray-100 py-2 px-4 border-b z-10">Audio</h2>
-            <div className="flex justify-end mb-4">
-            <button
-            onClick={handleCreateAudio}
-            className=" bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all duration-300 text-sm"
+    <div
+      className={`${
+        open ? "block" : "hidden"
+      } md:block w-[60%] md:w-[15%] h-full md:h-80 fixed ${
+        role === "admin" ? "left-0" : "left-28"
+      } z-10 top-14 md:top-24 list-none
+      text-gray-300 text-sm space-y-4 py-8 md:py-0
+      bg-white dark:bg-[#1E212A] md:dark:bg-inherit shadow-md 
+      md:shadow-none md:bg-transparent
+      `}
+    >
+      {role === "admin" ? (
+        <>
+          <li
+            onClick={() => navigate("/admin")}
+            className={
+              "flex items-center gap-2 mx-2 md:mx-0 px-4 py-1 cursor-pointer hover:bg-blue-100 hover:text-blue-400 transition-all " +
+              (location === "/admin" ? active : "")
+            }
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-4 h-4"
             >
-            Add Audio
-            </button>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4.5 12h15m-7.5-7.5v15"
+              />
+            </svg>
+            ADMIN HOME
+          </li>
+          <li
+            onClick={() => navigate("/manage")}
+            className={
+              "flex items-center gap-2 mx-2 md:mx-0 px-4 py-1 cursor-pointer hover:bg-blue-100 hover:text-blue-400 transition-all " +
+              (location === "/manage" ? active : "")
+            }
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9.75v-6m0 0L9.75 3m2.25 0L14.25 3m2.25 3v6m0 0L16.5 9.75m-1.5 0L18 9.75M6 15.75h12M6 18h12M6 21h12"
+              />
+            </svg>
+            MANAGE
+          </li>
+        </>
+      ) : (
+        <>
+          <li
+            onClick={() => navigate("/")}
+            className={
+              "flex items-center gap-2 mx-2 md:mx-0 px-4 py-1 hover:cursor-pointer hover:bg-blue-100 hover:text-blue-400 transition-all " +
+              (location === "/" ? active : " ")
+            }
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+              />
+            </svg>
+            HOME
+          </li>
 
-            </div>
-            <div className="h-[50vh] overflow-y-auto mt-2">
-              {audio.length > 0 ? (
-                audio.map((audioItem) => (
-                  <div key={audioItem.audioDetail.audioId} className="mb-4 p-4 border-b border-gray-300 flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">{audioItem.audioDetail.audioTitle || 'Untitled'}</h3>
-                    <button
-                      className="text-red-500 hover:text-red-700 transition-colors"
-                      onClick={() => {
-                        if (window.confirm('Are you sure you want to delete this audio?')) {
-                          handleDelete('audio', audioItem.audioDetail.audioId);
-                        }
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <p>No audio available.</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Show Create Audio Popup */}
-      {showCreateAudio && (
-        <CreateAudio onSuccess={handleAudioUploadSuccess} onClose={handleCloseCreateAudio} />
+          <li
+            onClick={() => navigate("/explore")}
+            className={
+              "flex items-center gap-2 mx-2 md:mx-0 px-4 py-1 cursor-pointer hover:bg-blue-100 hover:text-blue-400 transition-all " +
+              (location === "/explore" ? active : "")
+            }
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"
+              />
+            </svg>
+            EXPLORE TOPICS
+          </li>
+          <li
+            onClick={() => navigate("/article")}
+            className={
+              "flex items-center gap-2 mx-2 md:mx-0 px-4 py-1 cursor-pointer hover:bg-blue-100 hover:text-blue-400 transition-all " +
+              (location === "/article" ? active : "")
+            }
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M 3 2 L 3 20 M 6 5 L 16 5 L 16 6 L 6 6 Z M 6 8 L 16 8 L 16 9 L 6 9 Z M 6 11 L 16 11 L 16 12 L 6 12 Z M 19 2 L 3 2 M 19 20 L 19 2 M 19 20 L 3 20 M 6 14 L 16 14 L 16 15 L 6 15 Z"
+              />
+            </svg>
+            ARTICLE
+          </li>
+          <li
+            onClick={() => navigate("/myqna")}
+            className={
+              "flex items-center gap-2 mx-2 md:mx-0 px-4 py-1 cursor-pointer hover:bg-blue-100 hover:text-blue-400 transition-all " +
+              (location === "/myqna" ? active : "")
+            }
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4v2m0 4v6m0 4v2m7-12v6m0 4v2M5 6v6m0 4v2m7-12v6m0 4v2"
+              />
+            </svg>
+            MY QNA
+          </li>
+          <li
+            onClick={() => navigate("/audio")}
+            className={
+              "flex items-center gap-2 mx-2 md:mx-0 px-4 py-1 cursor-pointer hover:bg-blue-100 hover:text-blue-400 transition-all " +
+              (location === "/audio" ? active : "")
+            }
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4v16m-7-7h14m-7-7v14"
+              />
+            </svg>
+            AUDIO
+          </li>
+        </>
       )}
     </div>
   );
 };
 
-export default Manage;
+export default Sidebar;
