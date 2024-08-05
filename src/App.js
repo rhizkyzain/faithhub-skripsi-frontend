@@ -16,6 +16,8 @@ import Explore from "./pages/Explore";
 import Article from "./pages/Article";
 import ArticleDetails from "./pages/ArticleDetail";
 import { useEffect} from "react";
+import SearchResults from "./pages/SearchResult";
+
 
 
 const queryClient = new QueryClient();
@@ -113,6 +115,10 @@ const router = createBrowserRouter([
       {
         path: "/article/:articleId",
         element: <ArticleDetails />,
+      },
+      {
+        path: "/searchresults",
+        element: <SearchResults />,
       },
       {
         path: "*",

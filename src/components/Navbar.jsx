@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Search from "../icons/Search";
 import { useNavigate } from "react-router-dom";
 import Hamburger from "../icons/Hamburger";
@@ -9,60 +9,63 @@ import Logout from "../icons/Logout";
 import Dark from "../icons/Dark";
 import Light from "../icons/Light";
 import logo from '../assets/Studio_Sodwe__1_-removebg-preview.png';
+// import axios from 'axios';
 
 const Navbar = () => {
   const open = useSelector((state) => state.sidebar.open);
   const dark = useSelector((state) => state.theme.isDark);
-  console.log(dark);
   const dispatch = useDispatch();
-  const handleChange = (e) => {};
-  const user = localStorage.getItem("token");
-
   const navigate = useNavigate();
+
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    try {
+      // Navigate to the search results page with the search query
+      navigate(`/searchResults?query=${encodeURIComponent(searchQuery)}`);
+    } catch (err) {
+      console.error("Error searching questions:", err);
+    }
+  };
+
   return (
     <div
       className="fixed bg-white dark:bg-[#1E212A]
-     top-0 left-0 right-0 z-10 h-14  shadow-md  flex items-center justify-between
-     px-4
-     md:px-20"
+     top-0 left-0 right-0 z-10 h-14 shadow-md flex items-center justify-between
+     px-4 md:px-20"
     >
       <div className="text-sm md:text-base font-bold text-purple-500 cursor-pointer flex items-center gap-4">
         <div
           onClick={() => dispatch(toggle())}
-          className="
-          transition-transform   ease-linear
-        duration-700 cursor-pointer
-        "
+          className="transition-transform ease-linear duration-700 cursor-pointer"
         >
           {!open ? <Hamburger /> : <Cancel />}
-          <img src={logo} alt="Logo" className="h-20" /> {/* Replace text with logo */}
+          <img src={logo} alt="Logo" className="h-20" />
         </div>
-        {/* FaithHub */}
       </div>
 
-      {/* // Search Bar */}
-      {/* <div
-        className="searchbar hidden border-none outline-none rounded-md py-1 h-8 px-4 w-96 
-      bg-gray-100 md:flex items-center"
-      >
-        <Search />
-        <input
-          onChange={handleChange}
-          type="text"
-          className="border-none outline-none rounded-md py-1 px-2 w-96 bg-gray-100"
-          placeholder="Search for Topics"
-        />
-      </div> */}
+      <form onSubmit={handleSearch} className="flex-grow mx-4 flex justify-center">
+        <div className="relative w-100 "> {/* Set a fixed width for the search box */}
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full py-2 px-4 rounded-md border border-gray-300 dark:border-gray-700 dark:bg-[#1E212A] dark:text-white"
+            placeholder="Search questions..."
+          />
+          <button type="submit" className="absolute right-2 top-1/2 transform -translate-y-1/2">
+            <Search />
+          </button>
+        </div>
+      </form>
 
       <div className="flex items-center gap-3">
         {dark ? <Light /> : <Dark />}
-
-        {/* // Logout */}
         <Logout />
         <div className="hidden md:flex items-center gap-5">
           <div
-            className="cursor-pointer text-sm 
-          md:text-base dark:text-white"
+            className="cursor-pointer text-sm md:text-base dark:text-white"
             onClick={() => {
               localStorage.removeItem("token");
               navigate("/login");
@@ -70,17 +73,6 @@ const Navbar = () => {
           >
             Logout
           </div>
-          {/* <img
-            //onClick={() => navigate("/login")}
-            src={
-              user?.profileImage ||
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFY677t7F_8Epm50xo5OfqI882l5OBOPKRDxDWeGo7OQ&s"
-            }
-            alt="profile"
-            className="
-          w-6 h-6
-          md:w-7 md:h-7 rounded-full cursor-pointer"
-          /> */}
         </div>
       </div>
     </div>
