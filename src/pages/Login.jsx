@@ -29,8 +29,22 @@ const Login = () => {
         localStorage.setItem("token", token);
         toast.success("Logged in successfully");
 
+        // Fetch user profile
+        const profileRes = await axios.get('https://faithhub-skripsi-backend.vercel.app/api/auth/myProfile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const { role } = profileRes.data.data;
+        localStorage.setItem("role", role);
+
         setTimeout(() => {
-          navigate("/");
+          if (role === 'admin') {
+            navigate("/admin"); // Navigate to admin page
+          } else {
+            navigate("/");
+          }
         }, 1500);
       } else {
         toast.error("Something went wrong, please try again");
